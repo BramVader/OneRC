@@ -400,7 +400,8 @@ void decodeRC2(unsigned long value, int repeatCount, bool repeat)
       break;
   }
 
-  if (!suppressRC1A)
+  // Suppress first  repeat, arrow keys tend to act twice unless pressed very shortly
+  if (!suppressRC1A && (!repeat || repeatCount > 1))
   {
     switch (value)
     {
@@ -437,6 +438,18 @@ void decodeRC2(unsigned long value, int repeatCount, bool repeat)
       case RC2_FF:
         sendRC1A(RC1A_FF, repeat);
         break;
+      case RC2_RED:
+        sendRC1A(RC1A_RED, repeat);
+        break;
+      case RC2_GREEN:
+        sendRC1A(RC1A_GREEN, repeat);
+        break;
+      case RC2_YELLOW:
+        sendRC1A(RC1A_YELLOW, repeat);
+        break;
+      case RC2_BLUE:
+        sendRC1A(RC1A_BLUE, repeat);
+        break;
     }
   }
 
@@ -455,7 +468,7 @@ void decodeRC2(unsigned long value, int repeatCount, bool repeat)
         switch (value)
         {
           case RC2_0:
-            if (!suppressRC1A) sendRC1A(RC1A_0, 0);      // Force sending a 0
+            sendRC1A(RC1A_MENU, 0);      // Force sending a 0
             break;
           case RC2_1:
             sendRC3(RC3_MOVIE, 0);    // Soundbar in mode 'Movie'
@@ -491,6 +504,22 @@ void decodeRC2(unsigned long value, int repeatCount, bool repeat)
             }
             lastSpeakerModeTime = keyTime;
             break;
+          case RC2_5:
+            sendRC1A(RC1A_ONOFF, 0);     // Receiver ON/OFF
+            break;
+          case RC2_6:
+            sendRC1A(RC1A_RED, 0);     // Receiver Red
+            break;
+          case RC2_7:
+            sendRC1A(RC1A_GREEN, 0);     // Receiver Green
+            break;
+          case RC2_8:
+            sendRC1A(RC1A_YELLOW, 0);     // Receiver Yellow
+            break;
+          case RC2_9:
+            sendRC1A(RC1A_BLUE, 0);     // Receiver Blue
+            break;
+            
         }
         specialMode = 0;
       }
@@ -556,7 +585,7 @@ void loop() {
 
       if (logging)
       {
-        Serial.print(value);
+        Serial.print(value, HEX);
         Serial.print(repeat ? "*" : " ");
         Serial.print(" ---> ");
       }
